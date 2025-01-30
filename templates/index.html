@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snyk Report Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1>Snyk Security Report Dashboard</h1>
+        <div class="upload-form" id="dropZone">
+            <form action="/" method="post" enctype="multipart/form-data">
+                <div class="drop-zone">
+                    <div class="drop-zone-text">
+                        <p>Drag and drop your report file here</p>
+                        <p>or</p>
+                        <input type="file" name="file" accept=".txt" id="fileInput" required>
+                        <label for="fileInput" class="file-label">Choose File</label>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn">Analyze Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight(e) {
+            dropZone.classList.remove('drag-over');
+        }
+
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            
+            // Auto-submit if file is dropped
+            if (files.length > 0) {
+                document.querySelector('form').submit();
+            }
+        }
+    </script>
+</body>
+</html> 

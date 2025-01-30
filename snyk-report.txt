@@ -1,0 +1,35 @@
+ ✗ [Low] Spring Cross-Site Request Forgery (CSRF)
+   Path: src/main/java/com/cdac/paymentadministrationservices/testupi/controller/TestUPIDetailsController.java, line 23
+   Info: The testUPIDetails parameter is vulnerable to Cross Site Request Forgery (CSRF) attacks due to not using Spring Security. This could allow an attacker to execute requests on a user's behalf. Consider including Spring Security's CSRF protection within your application.
+
+ ✗ [Low] Spring Cross-Site Request Forgery (CSRF)
+   Path: src/main/java/com/cdac/paymentadministrationservices/integrationkit/controller/IntegrationKitController.java, line 50
+   Info: The integrationRequestDetails parameter is vulnerable to Cross Site Request Forgery (CSRF) attacks due to not using Spring Security. This could allow an attacker to execute requests on a user's behalf. Consider including Spring Security's CSRF protection within your application.
+
+ ✗ [Medium] Use of a Broken or Risky Cryptographic Algorithm
+   Path: src/main/java/com/cdac/paymentadministrationservices/merchant/controller/ClientController.java, line 178
+   Info: The CBC mode used in javax.crypto.Cipher.getInstance does not provide integrity. Consided using Galois/Counter Mode.
+
+ ✗ [Medium] Use of a Broken or Risky Cryptographic Algorithm
+   Path: src/main/java/com/cdac/paymentadministrationservices/merchant/controller/ClientController.java, line 779
+   Info: The CBC mode used in encrypt does not provide integrity. Consided using Galois/Counter Mode.
+
+ ✗ [High] Hardcoded Secret
+   Path: src/main/java/com/cdac/paymentadministrationservices/merchant/controller/ClientController.java, line 134
+   Info: Hardcoded value array {...} is used as a cipher initialization value. Generate the value with a cryptographically strong random number generator such as java.security.SecureRandom instead.
+
+ ✗ [High] Hardcoded Secret
+   Path: src/main/java/com/cdac/paymentadministrationservices/merchant/controller/ClientController.java, line 175
+   Info: Hardcoded value array {...} is used as a cipher initialization value. Generate the value with a cryptographically strong random number generator such as java.security.SecureRandom instead.
+
+
+✔ Test completed
+
+Organization:      6d941d45-d5e1-412f-97f3-8e8697c7d495
+Test type:         Static code analysis
+Project path:      D:\Code\pas-service
+
+Summary:
+
+  44 Code issues found
+  5 [High]   22 [Medium]   17 [Low]

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Snyk Report Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1>Security Analysis Results</h1>
+        
+        <div class="summary">
+            <h2>Vulnerability Summary</h2>
+            <div class="summary-boxes">
+                <div class="summary-box high" onclick="scrollToSeverity('high')">
+                    <span class="count">{{ report.summary.High }}</span>
+                    <span class="label">High Risk</span>
+                </div>
+                <div class="summary-box medium" onclick="scrollToSeverity('medium')">
+                    <span class="count">{{ report.summary.Medium }}</span>
+                    <span class="label">Medium Risk</span>
+                </div>
+                <div class="summary-box low" onclick="scrollToSeverity('low')">
+                    <span class="count">{{ report.summary.Low }}</span>
+                    <span class="label">Low Risk</span>
+                </div>
+            </div>
+            
+            <div class="export-buttons">
+                <button onclick="exportReport('pdf')" class="export-btn">Export PDF</button>
+                <button onclick="exportReport('csv')" class="export-btn">Export CSV</button>
+                <button onclick="exportReport('json')" class="export-btn">Export JSON</button>
+            </div>
+        </div>
+
+        <div class="issues">
+            {% for issue in report.issues %}
+            <div class="issue-card severity-{{ issue.severity.lower() }}">
+                <div class="issue-header" onclick="toggleInstances(this)">
+                    <span class="severity">{{ issue.severity }}</span>
+                    <span class="title">{{ issue.title }}</span>
+                    <span class="instance-count">{{ issue.count }} occurrence{{ 's' if issue.count > 1 else '' }}</span>
+                    <span class="expand-icon">▼</span>
+                    <button onclick="copyToClipboard(event, this)" class="copy-btn" title="Copy to clipboard">📋</button>
+                </div>
+                <div class="issue-details">
+                    <div class="info">
+                        <strong>Details:</strong> {{ issue.info }}
+                    </div>
+                    <div class="instances-list hidden">
+                        {% for instance in issue.instances %}
+                        <div class="instance">
+                            <div class="path">
+                                <strong>Path:</strong> {{ instance.path }}
+                                {% if instance.line %}
+                                <span class="line-number">Line {{ instance.line }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="back-button">
+            <a href="/" class="button">Analyze New Report</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleInstances(header) {
+            const card = header.closest('.issue-card');
+            const instancesList = card.querySelector('.instances-list');
+            const expandIcon = card.querySelector('.expand-icon');
+            
+            instancesList.classList.toggle('hidden');
+            expandIcon.style.transform = instancesList.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            
+            if (!instancesList.classList.contains('hidden')) {
+                instancesList.style.maxHeight = instancesList.scrollHeight + 'px';
+            } else {
+                instancesList.style.maxHeight = '0';
+            }
+        }
+
+        function scrollToSeverity(severity) {
+            const firstIssue = document.querySelector(`.severity-${severity}`);
+            if (firstIssue) {
+                const header = firstIssue.querySelector('.issue-header');
+                const instancesList = firstIssue.querySelector('.instances-list');
+                if (instancesList.classList.contains('hidden')) {
+                    toggleInstances(header);
+                }
+                
+                firstIssue.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        function copyToClipboard(event, button) {
+            event.stopPropagation();
+            const card = button.closest('.issue-card');
+            const issueData = {
+                severity: card.querySelector('.severity').textContent,
+                title: card.querySelector('.title').textContent,
+                info: card.querySelector('.info').textContent,
+                instances: Array.from(card.querySelectorAll('.instance')).map(instance => ({
+                    path: instance.querySelector('.path').textContent
+                }))
+            };
+            
+            navigator.clipboard.writeText(JSON.stringify(issueData, null, 2))
+                .then(() => {
+                    button.textContent = '✓';
+                    setTimeout(() => button.textContent = '📋', 2000);
+                })
+                .catch(err => console.error('Failed to copy:', err));
+        }
+
+        function exportReport(format) {
+            fetch(`/export/${format}`, {
+                method: 'GET',
+            })
+            .then(response => {
+                if (format === 'json') {
+                    return response.json();
+                } else if (format === 'csv') {
+                    return response.text();
+                } else {
+                    return response.blob();
+                }
+            })
+            .then(data => {
+                if (format === 'pdf') {
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `snyk-report.${format}`;
+                    a.click();
+                } else if (format === 'csv' || format === 'json') {
+                    const blob = new Blob([typeof data === 'string' ? data : JSON.stringify(data, null, 2)], 
+                        { type: format === 'csv' ? 'text/csv' : 'application/json' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `snyk-report.${format}`;
+                    a.click();
+                }
+            })
+            .catch(error => console.error('Export failed:', error));
+        }
+    </script>
+</body>
+</html> 
