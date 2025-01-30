@@ -5,9 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "new-feature" ]
 
 permissions:
   contents: read
@@ -21,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: |
-        echo "build"
+        bash snyk-test.sh
     - name: test
       run: |
         echo "test"
