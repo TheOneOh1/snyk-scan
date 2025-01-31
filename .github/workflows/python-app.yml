@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build
+        env:
+          SECRET_VAR_1: ${{ secrets.SNYK_ORG }}
+          SECRET_VAR_2: ${{ secrets.SNYK_TOKEN }}
         run: |
           bash snyk-test.sh
       - name: save txt

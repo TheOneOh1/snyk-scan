@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Using secret variables in script"
+echo "Secret 1: ${SNYK_ORG}"
+echo "Secret 2: ${SNYK_TOKEN}"
+
 # Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
