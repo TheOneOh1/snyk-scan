@@ -45,7 +45,8 @@ else
     output_file="snyk-report-${timestamp}.txt"
 
     # Run snyk test and save output
-    if SNYK_TOKEN=508d2e44-9912-44f2-8154-9df904327bdf snyk code test --org=6d941d45-d5e1-412f-97f3-8e8697c7d495 > "${output_file}" 2>&1; then
+    # if SNYK_TOKEN=508d2e44-9912-44f2-8154-9df904327bdf snyk code test --org=6d941d45-d5e1-412f-97f3-8e8697c7d495 > "${output_file}" 2>&1; then
+        if SNYK_TOKEN="$(SNYK_TOKEN)" snyk code test --org="$(SNYK_ORG)" > "${output_file}" 2>&1; then
         log_message "Successfully completed Snyk test. Results saved to ${output_file}"
     else
         log_message "Snyk test completed with some findings. Results saved to ${output_file}"
